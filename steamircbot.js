@@ -106,6 +106,23 @@ function steamAppName(app) {
 	return "Unknown App " + app;
 }
 
+function steamFindAppByName(name, allowFake) {
+	var regex = new RegExp(name, 'i');
+
+	var apps = allowFake ? g_AppNames : g_RealAppNames;
+	for(var appid in apps) {
+		if(!apps.hasOwnProperty(appid)) {
+			continue;
+		}
+
+		if(apps[appid].match(regex)) {
+			return parseInt(appid, 10);
+		}
+	}
+
+	return null;
+}
+
 function steamDigestAppinfo(info) {
 	for (var appid in info.apps) {
 		if(!info.apps.hasOwnProperty(appid)) {
