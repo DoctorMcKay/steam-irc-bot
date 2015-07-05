@@ -42,6 +42,57 @@ irc.on('registered', function() {
 	}
 });
 
+irc.on('message', function(sender, channel, message) {
+	var match = message.match(/^![a-zA-Z0-9]+( |$)/);
+	if(match) {
+		// This is a command
+		var parts = message.substring(1).trim().split(' ');
+		var command = parts[0].toLowerCase();
+		var args = parts.slice(1);
+
+		if(!g_IRCCommands[command]) {
+			// Not a command that we recognize
+			return;
+		}
+
+		if(!client.loggedOn || !tf2.haveGCSession) {
+			irc.notice(sender.nick, "Currently logged off of Steam or TF2 GC, please try again later.");
+			return;
+		}
+
+		// Parse arguments
+		var rawArgs = args.join(' ');
+		args = [];
+
+		var buf = '';
+		var quoted = false, escaped = false, c;
+
+		for(var i = 0; i < rawArgs.length; i++) {
+			c = rawArgs.charAt(i);
+
+			if(c == ' ' && !quoted) {
+				args.push(buf);
+				buf = '';
+			} else if(c == '"' && !escaped) {
+				quoted = !quoted;
+			} else if(c == '\\') {
+				escaped = true;
+			} else {
+				escaped = false;
+				buf += c;
+			}
+		}
+
+		if (buf.length > 0) {
+			args.push(buf);
+		}
+
+		args.raw = rawArgs;
+
+		g_IRCCommands[command].callback(sender, args, channel);
+	}
+});
+
 function ircAnnounce(message, action) {
 	Object.keys(irc.channels).forEach(function(channel) {
 		if(action) {
