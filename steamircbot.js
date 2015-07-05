@@ -41,7 +41,11 @@ irc.on('registered', function() {
 
 function ircAnnounce(message, action) {
 	Object.keys(irc.channels).forEach(function(channel) {
-		(action ? irc.action : irc.message)(channel, message);
+		if(action) {
+			irc.action(channel, message);
+		} else {
+			irc.message(channel, message);
+		}
 	});
 }
 
