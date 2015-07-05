@@ -138,6 +138,7 @@ function steamLogOn() {
 
 client.on('loggedOn', function() {
 	ircAnnounce("now connected to Steam!", true);
+	client.setPersonaState(Steam.EPersonaState.Online);
 	client.gamesPlayed([440]);
 
 	if(g_PicsChangenumber == 1) {
@@ -175,11 +176,7 @@ client.on('loggedOn', function() {
 });
 
 function steamAppName(app) {
-	if(g_AppNames[app]) {
-		return g_AppNames[app];
-	}
-
-	return "Unknown App " + app;
+	return g_AppNames[app] || "Unknown App " + app;
 }
 
 function steamFindAppByName(name, allowFake) {
@@ -205,11 +202,11 @@ function steamDigestAppinfo(info) {
 			continue;
 		}
 
-		if (info.apps[appid].appinfo && info.apps[appid].appinfo.common && info.apps[appid].appinfo.common.name) {
-			g_AppNames[appid] = info.apps[appid].appinfo.common.name;
+		if (info.apps[appid].data.appinfo && info.apps[appid].data.appinfo.common && info.apps[appid].data.appinfo.common.name) {
+			g_AppNames[appid] = info.apps[appid].data.appinfo.common.name;
 
-			if (['Config', 'DLC', 'Hardware', 'Media'].indexOf(info.apps[appid].appinfo.common.type) == -1) {
-				g_RealAppNames[appid] = info.apps[appid].appinfo.common.name;
+			if (['config', 'dlc', 'hardware', 'media'].indexOf((info.apps[appid].data.appinfo.common.type || '').toLowerCase()) == -1) {
+				g_RealAppNames[appid] = info.apps[appid].data.appinfo.common.name;
 			}
 		}
 	}
@@ -310,5 +307,7 @@ Number.prototype.format = function() {
 exports.steam = client;
 exports.irc = irc;
 exports.tf2 = tf2;
+exports.ircCommands = g_IRCCommands;
+exports.steamAppNames = g_AppNames;
 exports.steamFindAppByName = steamFindAppByName;
 exports.steamAppName = steamAppName;

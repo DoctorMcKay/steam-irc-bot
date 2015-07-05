@@ -11,6 +11,8 @@
 		"steamstuff": "^1.1.5",
 		"internet-relay-chat": "^1.1.5",
 		"tf2": "^1.1.4",
-		"request": "^2.58.0"
+		"request": "^2.58.0",
+		"steamid": "^0.3.0",
+		"sourcequery": "^0.0.2"
 	}
 }
