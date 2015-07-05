@@ -1,0 +1,12 @@
+{
+	"name": "steam-irc-bot",
+	"version": "1.0.0",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/DoctorMcKay/steam-irc-bot.git"
+	},
+	"dependencies": {
+		"steam": "DoctorMcKay/node-steam#mckay-iojs",
+		"internet-relay-chat": "^1.1.5"
+	}
+}
