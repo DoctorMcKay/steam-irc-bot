@@ -12,6 +12,9 @@ var config = require('./config.json');
 var g_SteamInit = false;
 var g_TF2Version;
 var g_TF2SchemaVersion;
+var g_PicsChangenumber = 1;
+var g_AppNames = {};
+var g_RealAppNames = {};
 
 // Initialize
 var client = new Steam.SteamClient();
@@ -60,7 +63,64 @@ function steamLogOn() {
 client.on('loggedOn', function() {
 	ircAnnounce("now connected to Steam!", true);
 	client.gamesPlayed([440]);
+
+	if(g_PicsChangenumber == 1) {
+		console.log("Steam now logged in, requesting full PICS update for app names...");
+		client.picsGetChangesSince(1, true, false, function (result) {
+			g_PicsChangenumber = result.currentChangeNumber;
+			var apps = result.appChanges.map(function (app) {
+				return app.appid;
+			});
+
+			setInterval(function() {
+				client.picsGetChangesSince(g_PicsChangenumber, true, false, function(picsResult) {
+					if(picsResult.currentChangeNumber == g_PicsChangenumber) {
+						return; // Nothing changed
+					}
+
+					var picsApps = picsResult.appChanges.map(function(app) {
+						return app.appid;
+					});
+
+					picsApps.forEach(function(app) {
+						if(config.importantApps.indexOf(app) != -1) {
+							ircAnnounce("Important app change: " + IRC.colors.bold + steamAppName(app) + IRC.colors.reset + " - https://steamdb.info/app/" + app + "/history/");
+						}
+					});
+
+					client.picsGetProductInfo(apps, [], steamDigestAppinfo);
+				});
+			}, 5000);
+
+			console.log("Got list of " + apps.length + " appids for changenumber " + g_PicsChangenumber + ", requesting info");
+			client.picsGetProductInfo(apps, [], steamDigestAppinfo);
+		});
+	}
 });
+
+function steamAppName(app) {
+	if(g_AppNames[app]) {
+		return g_AppNames[app];
+	}
+
+	return "Unknown App " + app;
+}
+
+function steamDigestAppinfo(info) {
+	for (var appid in info.apps) {
+		if(!info.apps.hasOwnProperty(appid)) {
+			continue;
+		}
+
+		if (info.apps[appid].appinfo && info.apps[appid].appinfo.common && info.apps[appid].appinfo.common.name) {
+			g_AppNames[appid] = info.apps[appid].appinfo.common.name;
+
+			if (['Config', 'DLC', 'Hardware', 'Media'].indexOf(info.apps[appid].appinfo.common.type) == -1) {
+				g_RealAppNames[appid] = info.apps[appid].appinfo.common.name;
+			}
+		}
+	}
+}
 
 client.on('loggedOff', function() {
 	ircAnnounce("now disconnected from Steam: ServiceUnavailable");
