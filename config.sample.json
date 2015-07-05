@@ -1,0 +1,21 @@
+{
+	"irc": {
+		"username": "steamircbot",
+		"realname": "https://github.com/DoctorMcKay/steam-irc-bot",
+		"nick": "SteamTF2",
+		"server": "irc.quakenet.org",
+		"port": 6667
+	},
+
+	"channels": [
+		"#r/tf2"
+	],
+
+	"steam": {
+		"username": "",
+		"password": "",
+		"admins": [
+			"76561198006409530"
+		]
+	}
+}
