@@ -43,7 +43,7 @@ irc.on('registered', function() {
 });
 
 irc.on('message', function(sender, channel, message) {
-	var match = message.match(/^![a-zA-Z0-9]+( |$)/);
+	var match = message.match(/^\.[a-zA-Z0-9]+( |$)/);
 	if(match) {
 		// This is a command
 		var parts = message.substring(1).trim().split(' ');
