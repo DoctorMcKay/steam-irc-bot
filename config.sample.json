@@ -13,9 +13,9 @@
 
 	"steam": {
 		"username": "",
-		"password": "",
-		"admins": [
-			"76561198006409530"
-		]
-	}
+		"password": ""
+	},
+
+	"tf2LangUrl": "",
+	"importantApps": [440, 232250]
 }
