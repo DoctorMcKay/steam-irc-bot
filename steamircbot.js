@@ -223,3 +223,10 @@ function tf2SetLang() {
 		});
 	}
 }
+
+// Exports
+exports.steam = client;
+exports.irc = irc;
+exports.tf2 = tf2;
+exports.steamFindAppByName = steamFindAppByName;
+exports.steamAppName = steamAppName;
