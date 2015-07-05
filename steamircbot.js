@@ -4,6 +4,7 @@ var SteamStuff = require('steamstuff');
 var TeamFortress2 = require('tf2');
 var IRC = require('internet-relay-chat');
 var request = require('request');
+var fs = require('fs');
 
 // Include config
 var config = require('./config.json');
@@ -15,6 +16,7 @@ var g_TF2SchemaVersion;
 var g_PicsChangenumber = 1;
 var g_AppNames = {};
 var g_RealAppNames = {};
+var g_IRCCommands = {};
 
 // Initialize
 var client = new Steam.SteamClient();
@@ -102,6 +104,29 @@ function ircAnnounce(message, action) {
 		}
 	});
 }
+
+function ircPrefixMsg(target, prefix, msg) {
+	irc.message(target, IRC.colors.bold + prefix + ": " + IRC.colors.reset + msg);
+}
+
+// Load IRC commands
+fs.readdir(__dirname + '/irc-commands', function(err, files) {
+	if(err) {
+		console.log("Couldn't read irc-commands: " + err);
+		return;
+	}
+
+	files.forEach(function(file) {
+		if(file.match(/\.js$/)) {
+			var command = require(__dirname + '/irc-commands/' + file)(ircPrefixMsg);
+			command.triggers.forEach(function(trigger) {
+				g_IRCCommands[trigger] = command;
+			});
+
+			console.log("Loaded IRC command " + command.triggers[0]);
+		}
+	})
+});
 
 // Set up Steam
 function steamLogOn() {
@@ -274,6 +299,12 @@ function tf2SetLang() {
 		});
 	}
 }
+
+// Do bad things
+// This is monstrous but since node doesn't have toLocaleString... ¯\_(?)_/¯
+Number.prototype.format = function() {
+	return this.toString().split('').reverse().join('').replace(/(\d{3})/g, '$1,').split('').reverse().join('').replace(/^,/, '');
+};
 
 // Exports
 exports.steam = client;
