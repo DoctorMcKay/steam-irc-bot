@@ -24,6 +24,11 @@ SteamStuff(Steam, client);
 var tf2 = new TeamFortress2(client);
 var irc = new IRC(config.irc);
 
+// Load item schema
+if(fs.existsSync(__dirname + '/item-schema.json')) {
+	tf2.itemSchema = require('./item-schema.json');
+}
+
 // Set up IRC
 irc.connect();
 
@@ -265,6 +270,10 @@ tf2.on('itemSchema', function(version, url) {
 	ircAnnounce("TF2 item schema updated (version = " + version + ", old version = " + g_TF2SchemaVersion + "): " + url);
 	g_TF2SchemaVersion = version;
 	tf2SetLang();
+});
+
+tf2.on('itemSchemaLoaded', function() {
+	fs.writeFile(__dirname + '/item-schema.json', JSON.stringify(tf2.itemSchema, undefined, "\t"));
 });
 
 tf2.on('systemMessage', function(msg) {
