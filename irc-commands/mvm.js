@@ -101,7 +101,7 @@ module.exports = function(prefixMsg) {
 						break;
 					}
 					
-					global.steam.getServerList("\\appid\\440\\white\\1\\name_match\\*mann up*\\map\\" + g_Tours[args[1]].missions[args[2]].missionMapName, 5000, function(servers) {
+					require.main.exports.steam.getServerList("\\appid\\440\\white\\1\\name_match\\*mann up*\\map\\" + g_Tours[args[1]].missions[args[2]].missionMapName, 5000, function(servers) {
 						var numServers = {};
 						
 						servers.forEach(function(server) {
@@ -131,7 +131,7 @@ module.exports = function(prefixMsg) {
 					break;
 				
 				case 'empty':
-					global.steam.getServerList("\\appid\\440\\white\\1\\name_match\\*mann up*\\nor\\1\\hasplayers\\1", 5000, function(servers) {
+					require.main.exports.steam.getServerList("\\appid\\440\\white\\1\\name_match\\*mann up*\\nor\\1\\hasplayers\\1", 5000, function(servers) {
 						prefixMsg(channel, sender.nick, "There are " + servers.length + " empty Mann Up servers.");
 					});
 					
