@@ -71,7 +71,7 @@ module.exports = function(prefixMsg) {
 				
 				case 'missions':
 					if(args.length != 2) {
-						require.main.exports.ircnotice(sender.nick, "Usage: mvm missions <tour>");
+						require.main.exports.irc.notice(sender.nick, "Usage: mvm missions <tour>");
 						break;
 					}
 					
@@ -87,7 +87,7 @@ module.exports = function(prefixMsg) {
 				case 'games':
 				case 'servers':
 					if(args.length != 3) {
-						require.main.exports.ircnotice(sender.nick, "Usage: mvm " + args[0] + " <tour> <mission>");
+						require.main.exports.irc.notice(sender.nick, "Usage: mvm " + args[0] + " <tour> <mission>");
 						break;
 					}
 					
@@ -138,7 +138,7 @@ module.exports = function(prefixMsg) {
 					break;
 				
 				default:
-					require.main.exports.ircnotice(sender.nick, "Usage: mvm <tours|missions|games|empty>");
+					require.main.exports.irc.notice(sender.nick, "Usage: mvm <tours|missions|games|empty>");
 					break;
 			}
 		}
