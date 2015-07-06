@@ -27,6 +27,7 @@ var irc = new IRC(config.irc);
 // Load item schema
 if(fs.existsSync(__dirname + '/item-schema.json')) {
 	tf2.itemSchema = require('./item-schema.json');
+	tf2SetLang();
 }
 
 // Set up IRC
