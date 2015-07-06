@@ -213,7 +213,7 @@ function steamDigestAppinfo(info) {
 }
 
 client.on('loggedOff', function() {
-	ircAnnounce("now disconnected from Steam: ServiceUnavailable");
+	ircAnnounce("now disconnected from Steam: ServiceUnavailable", true);
 });
 
 client.on('error', function(e) {
@@ -229,7 +229,7 @@ client.on('error', function(e) {
 		}
 	}
 
-	ircAnnounce("now disconnected from Steam: " + result);
+	ircAnnounce("now disconnected from Steam: " + result, true);
 });
 
 // Set up TF2
