@@ -155,6 +155,10 @@ client.on('loggedOn', function() {
 			});
 
 			setInterval(function() {
+				if(!steam.loggedOn) {
+					return;
+				}
+				
 				client.picsGetChangesSince(g_PicsChangenumber, true, false, function(picsResult) {
 					if(picsResult.currentChangeNumber == g_PicsChangenumber) {
 						return; // Nothing changed
