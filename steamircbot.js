@@ -165,6 +165,8 @@ client.on('loggedOn', function() {
 						return; // Nothing changed
 					}
 
+					g_PicsChangenumber = result.currentChangeNumber;
+
 					var picsApps = picsResult.appChanges.map(function(app) {
 						return app.appid;
 					});
