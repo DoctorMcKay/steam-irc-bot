@@ -27,6 +27,7 @@ var irc = new IRC(config.irc);
 // Load item schema
 if(fs.existsSync(__dirname + '/item-schema.json')) {
 	tf2.itemSchema = require('./item-schema.json');
+	g_TF2SchemaVersion = tf2.itemSchema.version;
 	tf2SetLang();
 }
 
@@ -274,12 +275,17 @@ tf2.on('itemSchema', function(version, url) {
 		return;
 	}
 
+	if(version == g_TF2SchemaVersion) {
+		return;
+	}
+
 	ircAnnounce("TF2 item schema updated (version = " + version + ", old version = " + g_TF2SchemaVersion + "): " + url);
 	g_TF2SchemaVersion = version;
 	tf2SetLang();
 });
 
 tf2.on('itemSchemaLoaded', function() {
+	tf2.itemSchema.version = g_TF2SchemaVersion;
 	fs.writeFile(__dirname + '/item-schema.json', JSON.stringify(tf2.itemSchema, undefined, "\t"));
 });
 
