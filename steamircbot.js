@@ -114,7 +114,7 @@ irc.on('message', function(sender, channel, message) {
 			return;
 		}
 
-		if(!client.loggedOn || !tf2.haveGCSession) {
+		if(!client.steamID || !tf2.haveGCSession) {
 			irc.notice(sender.nick, "Currently logged off of Steam or TF2 GC, please try again later.");
 			return;
 		}
