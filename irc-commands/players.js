@@ -1,9 +1,4 @@
-var ACCESS_PUBLIC = 0;
-var ACCESS_ADMIN = 1;
-var ACCESS_SENIOR_ADMIN = 2;
-var ACCESS_ROOT = 3;
-
-var Steam = require('steam');
+var SteamUser = require('steam-user');
 
 module.exports = function(prefixMsg) {
 	return {
@@ -24,17 +19,9 @@ module.exports = function(prefixMsg) {
 				}
 			}
 			
-			require.main.exports.steam.getNumberOfCurrentPlayers(appid, function(result, players) {
-				if(result != Steam.EResult.OK) {
-					var eresult = result;
-					for(var i in Steam.EResult) {
-						if(Steam.EResult[i] == result) {
-							eresult = i;
-							break;
-						}
-					}
-					
-					prefixMsg(channel, sender.nick, "Error: " + eresult);
+			require.main.exports.steam.getPlayerCount(appid, function(result, players) {
+				if(result != SteamUser.EResult.OK) {
+					prefixMsg(channel, sender.nick, "Error getting player count for " + require.main.exports.steamAppName(appid) + " (" + appid + "): " + (SteamUser.EResult[result] || result));
 				} else {
 					prefixMsg(channel, sender.nick, (appid === 0 ? "Steam users" : require.main.exports.steamAppName(appid) + " (" + appid + ") players") + ": " + players.format());
 				}

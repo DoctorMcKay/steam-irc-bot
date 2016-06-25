@@ -7,7 +7,7 @@ module.exports = function(prefixMsg) {
 		"callback": function(sender, args, channel) {
 			var apps = Object.keys(require.main.exports.steamAppNames);
 			var appid = apps[Math.floor(Math.random() * apps.length)];
-			prefixMsg(channel, sender.nick, "Feeling lucky? You might like to try " + IRC.colors.bold + require.main.exports.steamAppName(appid) + IRC.colors.bold + " - http://steam.pm/app/" + appid);
+			prefixMsg(channel, sender.nick, "Feeling lucky? You might like to try " + IRC.colors.bold + require.main.exports.steamAppName(appid) + IRC.colors.bold + " - https://steam.pm/app/" + appid);
 		}
 	};
 };

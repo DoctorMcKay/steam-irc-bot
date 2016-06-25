@@ -1,6 +1,5 @@
 // Include modules
-var Steam = require('steam');
-var SteamStuff = require('steamstuff');
+var SteamUser = require('steam-user');
 var TeamFortress2 = require('tf2');
 var IRC = require('internet-relay-chat');
 var request = require('request');
@@ -19,8 +18,7 @@ var g_RealAppNames = {};
 var g_IRCCommands = {};
 
 // Initialize
-var client = new Steam.SteamClient();
-SteamStuff(Steam, client);
+var client = new SteamUser();
 var tf2 = new TeamFortress2(client);
 var irc = new IRC(config.irc);
 
@@ -53,7 +51,7 @@ request.get({
 request.get({
 	"uri": "https://steamdb.info/api/GetAppList/?apptype=" + [1, 2, 5].join(','),
 	"headers": {
-		"User-Agent": "steam-irc-bot by Dr. McKay",
+		"User-Agent": "steam-irc-bot by Dr. McKay"
 	},
 	"json": true,
 	"gzip": true
@@ -197,30 +195,28 @@ function steamLogOn() {
 
 client.on('loggedOn', function() {
 	ircAnnounce("now connected to Steam!", true);
-	client.setPersonaState(Steam.EPersonaState.Online);
+	client.setPersonaState(SteamUser.EPersonaState.Online);
 	client.gamesPlayed([440]);
 
 	if(g_PicsChangenumber == 1) {
 		console.log("Steam now logged in, requesting full PICS update for current changenumber...");
-		client.picsGetChangesSince(1, true, false, function (result) {
-			g_PicsChangenumber = result.currentChangeNumber;
-			var apps = result.appChanges.map(function (app) {
-				return app.appid;
-			});
+		client.getProductChanges(1, function(result) {
+			g_PicsChangenumber = result.currentChangenumber;
+			console.log("Got current changenumber " + g_PicsChangenumber);
 
 			setInterval(function() {
 				if(!client.loggedOn) {
 					return;
 				}
 
-				client.picsGetChangesSince(g_PicsChangenumber, true, false, function(picsResult) {
-					if(picsResult.currentChangeNumber == g_PicsChangenumber) {
+				client.getProductChanges(g_PicsChangenumber, function(picsResult) {
+					if(picsResult.currentChangenumber == g_PicsChangenumber) {
 						return; // Nothing changed
 					}
 
-					g_PicsChangenumber = picsResult.currentChangeNumber;
+					g_PicsChangenumber = picsResult.currentChangenumber;
 
-					var picsApps = picsResult.appChanges.map(function(app) {
+					var picsApps = picsResult.apps.map(function(app) {
 						return app.appid;
 					});
 
@@ -230,12 +226,9 @@ client.on('loggedOn', function() {
 						}
 					});
 
-					client.picsGetProductInfo(apps, [], steamDigestAppinfo);
+					client.getProductInfo(apps, [], steamDigestAppinfo);
 				});
 			}, 5000);
-
-			console.log("Got list of " + apps.length + " appids for changenumber " + g_PicsChangenumber + ", requesting info");
-			client.picsGetProductInfo(apps, [], steamDigestAppinfo);
 		});
 	}
 });
@@ -267,33 +260,22 @@ function steamDigestAppinfo(info) {
 			continue;
 		}
 
-		if (info.apps[appid].data.appinfo && info.apps[appid].data.appinfo.common && info.apps[appid].data.appinfo.common.name) {
-			g_AppNames[appid] = info.apps[appid].data.appinfo.common.name;
+		if (info.apps[appid].appinfo && info.apps[appid].appinfo.common && info.apps[appid].appinfo.common.name) {
+			g_AppNames[appid] = info.apps[appid].appinfo.common.name;
 
-			if (['config', 'dlc', 'hardware', 'media'].indexOf((info.apps[appid].data.appinfo.common.type || '').toLowerCase()) == -1) {
-				g_RealAppNames[appid] = info.apps[appid].data.appinfo.common.name;
+			if (['config', 'dlc', 'hardware', 'media'].indexOf((info.apps[appid].appinfo.common.type || '').toLowerCase()) == -1) {
+				g_RealAppNames[appid] = info.apps[appid].appinfo.common.name;
 			}
 		}
 	}
 }
 
-client.on('loggedOff', function() {
-	ircAnnounce("now disconnected from Steam: ServiceUnavailable", true);
+client.on('disconnected', function(eresult, msg) {
+	ircAnnounce("now disconnected from Steam: " + (msg || SteamUser.EResult[eresult] || eresult), true);
 });
 
 client.on('error', function(e) {
-	if(e.eresult == Steam.EResult.AccountLogonDenied) {
-		return; // SteamStuff handles this
-	}
-
-	var result = e.eresult;
-	for(var i in Steam.EResult) {
-		if(Steam.EResult[i] == e.eresult) {
-			result = i;
-			break;
-		}
-	}
-
+	var result = SteamUser.EResult[e.eresult] || e.eresult;
 	ircAnnounce("now disconnected from Steam: " + result, true);
 });
 
