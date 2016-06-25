@@ -31,6 +31,42 @@ if(fs.existsSync(__dirname + '/item-schema.json')) {
 	tf2SetLang();
 }
 
+// Get all app names from SteamDB
+request.get({
+	"uri": "https://steamdb.info/api/GetAppList/",
+	"headers": {
+		"User-Agent": "steam-irc-bot by Dr. McKay"
+	},
+	"json": true,
+	"gzip": true
+}, function(err, response, body) {
+	if (err || response.statusCode != 200) {
+		console.log("Can't get SteamDB app list: " + (err ? err.message : "HTTP error " + response.statusCode));
+	} else if (!body.success) {
+		console.log("Can't get SteamDB app list: success is not true");
+	} else {
+		g_AppNames = body.data;
+	}
+});
+
+// Get "real" app names from SteamDB
+request.get({
+	"uri": "https://steamdb.info/api/GetAppList/?apptype=" + [1, 2, 5].join(','),
+	"headers": {
+		"User-Agent": "steam-irc-bot by Dr. McKay",
+	},
+	"json": true,
+	"gzip": true
+}, function(err, response, body) {
+	if (err || response.statusCode != 200) {
+		console.log("Can't get SteamDB real app list: " + (err ? err.message : "HTTP error " + response.statusCode));
+	} else if (!body.success) {
+		console.log("Can't get SteamDB real app list: success is not true");
+	} else {
+		g_RealAppNames = body.data;
+	}
+});
+
 // Set up IRC
 irc.connect();
 
@@ -165,7 +201,7 @@ client.on('loggedOn', function() {
 	client.gamesPlayed([440]);
 
 	if(g_PicsChangenumber == 1) {
-		console.log("Steam now logged in, requesting full PICS update for app names...");
+		console.log("Steam now logged in, requesting full PICS update for current changenumber...");
 		client.picsGetChangesSince(1, true, false, function (result) {
 			g_PicsChangenumber = result.currentChangeNumber;
 			var apps = result.appChanges.map(function (app) {
@@ -336,7 +372,7 @@ function tf2SetLang() {
 }
 
 // Do bad things
-// This is monstrous but since node doesn't have toLocaleString... ¯\_(?)_/¯
+// This is monstrous but since node doesn't have toLocaleString... Â¯\_(ãƒ„)_/Â¯
 Number.prototype.format = function() {
 	return this.toString().split('').reverse().join('').replace(/(\d{3})/g, '$1,').split('').reverse().join('').replace(/^,/, '');
 };
