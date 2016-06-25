@@ -39,7 +39,23 @@ irc.on('connect', function() {
 });
 
 irc.on('registered', function() {
-	console.log("Registered with IRC, joining channels");
+	console.log("Registered with IRC");
+
+	if (config.quakenetPassword) {
+		console.log("Authenticating with Q");
+		irc.sendRawLine("AUTH " + config.irc.nick + " " + config.quakenetPassword);
+		setTimeout(function() {
+			irc.mode(irc.myNick, "+x", function() {
+				setTimeout(joinChannels, 1000);
+			});
+		}, 3000);
+	} else {
+		joinChannels();
+	}
+});
+
+function joinChannels() {
+	console.log("Joining channels");
 	config.channels.forEach(function(channel) {
 		irc.join(channel);
 	});
@@ -49,7 +65,7 @@ irc.on('registered', function() {
 		g_SteamInit = true;
 		steamLogOn();
 	}
-});
+}
 
 irc.on('message', function(sender, channel, message) {
 	var match = message.match(/^![a-zA-Z0-9]+( |$)/);
