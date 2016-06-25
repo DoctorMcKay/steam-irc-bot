@@ -200,8 +200,8 @@ client.on('loggedOn', function() {
 
 	if(g_PicsChangenumber == 1) {
 		console.log("Steam now logged in, requesting full PICS update for current changenumber...");
-		client.getProductChanges(1, function(result) {
-			g_PicsChangenumber = result.currentChangenumber;
+		client.getProductChanges(1, function(currentChangenumber) {
+			g_PicsChangenumber = currentChangenumber;
 			console.log("Got current changenumber " + g_PicsChangenumber);
 
 			setInterval(function() {
@@ -209,18 +209,18 @@ client.on('loggedOn', function() {
 					return;
 				}
 
-				client.getProductChanges(g_PicsChangenumber, function(picsResult) {
-					if(picsResult.currentChangenumber == g_PicsChangenumber) {
+				client.getProductChanges(g_PicsChangenumber, function(currentChangenumber, result) {
+					if(currentChangenumber == g_PicsChangenumber) {
 						return; // Nothing changed
 					}
 
-					g_PicsChangenumber = picsResult.currentChangenumber;
+					g_PicsChangenumber = currentChangenumber;
 
-					var picsApps = picsResult.apps.map(function(app) {
+					var apps = result.apps.map(function(app) {
 						return app.appid;
 					});
 
-					picsApps.forEach(function(app) {
+					apps.forEach(function(app) {
 						if(config.importantApps.indexOf(app) != -1) {
 							ircAnnounce("Important app change: " + IRC.colors.bold + steamAppName(app) + IRC.colors.reset + " - https://steamdb.info/app/" + app + "/history/");
 						}
