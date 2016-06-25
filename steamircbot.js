@@ -195,7 +195,7 @@ function steamLogOn() {
 
 client.on('loggedOn', function() {
 	ircAnnounce("now connected to Steam!", true);
-	client.setPersonaState(SteamUser.EPersonaState.Online);
+	client.setPersona(SteamUser.EPersonaState.Online);
 	client.gamesPlayed([440]);
 
 	if(g_PicsChangenumber == 1) {
