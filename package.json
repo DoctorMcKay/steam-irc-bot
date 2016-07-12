@@ -9,7 +9,7 @@
 	"dependencies": {
 		"steam-user": "^3.8.0",
 		"internet-relay-chat": "^1.1.5",
-		"tf2": "^2.0.3",
+		"tf2": "^2.1.0",
 		"request": "^2.58.0",
 		"steamid": "^1.0.0",
 		"sourcequery": "^0.0.2"
